@@ -1,16 +1,22 @@
-// app/api/rides/[id]/accept/route.ts
 import { NextRequest, NextResponse } from 'next/server'
 import { getServerSession } from 'next-auth'
 import { authOptions } from '@/lib/auth'
-import { prisma } from '@/lib/prisma' 
+import { prisma } from '@/lib/prisma'
+import type { NextApiRequest } from 'next'
+import type { NextPageContext } from 'next'
+import type { NextRequest as AppRequest } from 'next/server'
 
-export async function POST(
-  request: NextRequest,
-  { params }: { params: { id: string } }
-) {
+// ✅ This type is required for dynamic routes in App Router
+type Context = {
+  params: { id: string }
+}
+
+export async function POST(request: NextRequest, context: Context) {
+  const { id: rideId } = context.params
+
   try {
     const session = await getServerSession(authOptions)
-    
+
     if (!session || !session.user) {
       return NextResponse.json({ message: 'Unauthorized' }, { status: 401 })
     }
@@ -19,9 +25,6 @@ export async function POST(
       return NextResponse.json({ message: 'Only drivers can accept rides' }, { status: 403 })
     }
 
-    const rideId = params.id
-
-    // Check if driver already has an active ride
     const existingRide = await prisma.ride.findFirst({
       where: {
         driverId: session.user.id,
@@ -37,7 +40,6 @@ export async function POST(
       }, { status: 400 })
     }
 
-    // Check if the ride exists and is available
     const ride = await prisma.ride.findUnique({
       where: { id: rideId },
       include: {
@@ -67,7 +69,6 @@ export async function POST(
       }, { status: 400 })
     }
 
-    // Accept the ride
     const updatedRide = await prisma.ride.update({
       where: { id: rideId },
       data: {
@@ -92,8 +93,6 @@ export async function POST(
 
   } catch (error) {
     console.error('Error accepting ride:', error)
-    return NextResponse.json({ 
-      message: 'Internal server error' 
-    }, { status: 500 })
+    return NextResponse.json({ message: 'Internal server error' }, { status: 500 })
   }
 }
