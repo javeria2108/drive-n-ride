@@ -2,17 +2,12 @@ import { NextRequest, NextResponse } from 'next/server'
 import { getServerSession } from 'next-auth'
 import { authOptions } from '@/lib/auth'
 import { prisma } from '@/lib/prisma'
-import type { NextApiRequest } from 'next'
-import type { NextPageContext } from 'next'
-import type { NextRequest as AppRequest } from 'next/server'
 
-// ✅ This type is required for dynamic routes in App Router
-type Context = {
-  params: { id: string }
-}
-
-export async function POST(request: NextRequest, context: Context) {
-  const { id: rideId } = context.params
+export async function POST(
+  request: NextRequest,
+  context: { params: { id: string } } // ✅ MUST use inline type like this
+) {
+  const rideId = context.params.id
 
   try {
     const session = await getServerSession(authOptions)
@@ -28,15 +23,13 @@ export async function POST(request: NextRequest, context: Context) {
     const existingRide = await prisma.ride.findFirst({
       where: {
         driverId: session.user.id,
-        status: {
-          in: ['accepted', 'in_progress']
-        }
-      }
+        status: { in: ['accepted', 'in_progress'] },
+      },
     })
 
     if (existingRide) {
-      return NextResponse.json({ 
-        message: 'You already have an active ride. Please complete it first.' 
+      return NextResponse.json({
+        message: 'You already have an active ride. Please complete it first.',
       }, { status: 400 })
     }
 
@@ -47,10 +40,10 @@ export async function POST(request: NextRequest, context: Context) {
           select: {
             id: true,
             name: true,
-            phone: true
-          }
-        }
-      }
+            phone: true,
+          },
+        },
+      },
     })
 
     if (!ride) {
@@ -58,14 +51,14 @@ export async function POST(request: NextRequest, context: Context) {
     }
 
     if (ride.status !== 'requested') {
-      return NextResponse.json({ 
-        message: 'This ride is no longer available' 
+      return NextResponse.json({
+        message: 'This ride is no longer available',
       }, { status: 400 })
     }
 
     if (ride.driverId) {
-      return NextResponse.json({ 
-        message: 'This ride has already been accepted by another driver' 
+      return NextResponse.json({
+        message: 'This ride has already been accepted by another driver',
       }, { status: 400 })
     }
 
@@ -73,26 +66,28 @@ export async function POST(request: NextRequest, context: Context) {
       where: { id: rideId },
       data: {
         driverId: session.user.id,
-        status: 'accepted'
+        status: 'accepted',
       },
       include: {
         passenger: {
           select: {
             id: true,
             name: true,
-            phone: true
-          }
-        }
-      }
+            phone: true,
+          },
+        },
+      },
     })
 
-    return NextResponse.json({ 
-      message: 'Ride accepted successfully', 
-      ride: updatedRide 
+    return NextResponse.json({
+      message: 'Ride accepted successfully',
+      ride: updatedRide,
     }, { status: 200 })
 
   } catch (error) {
     console.error('Error accepting ride:', error)
-    return NextResponse.json({ message: 'Internal server error' }, { status: 500 })
+    return NextResponse.json({
+      message: 'Internal server error',
+    }, { status: 500 })
   }
 }
