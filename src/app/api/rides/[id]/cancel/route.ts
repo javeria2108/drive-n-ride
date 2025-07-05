@@ -2,10 +2,8 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { getServerSession } from 'next-auth'
 import { authOptions } from '@/lib/auth'
-import { PrismaClient, Role } from '@/src/generated/prisma'
-
-const prisma = new PrismaClient()
-
+import { prisma } from '@/lib/prisma' 
+import { Role } from '@/src/generated/prisma'
 export async function POST(
   request: NextRequest,
   { params }: { params: { id: string } }
