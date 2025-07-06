@@ -5,6 +5,58 @@
     "version": "1.0.0",
     "description": "API documentation for the Drive-N-Ride backend"
   },
+  "components": {
+    "schemas": {
+      "Ride": {
+        "type": "object",
+        "properties": {
+          "id": { "type": "string" },
+          "passengerId": { "type": "string" },
+          "driverId": { "type": "string", "nullable": true },
+          "pickupLocation": { "type": "string" },
+          "dropLocation": { "type": "string" },
+          "rideType": { "type": "string" },
+          "distanceKm": { "type": "number" },
+          "fare": { "type": "number" },
+          "discountedFare": { "type": "number", "nullable": true },
+          "status": { 
+            "type": "string",
+            "enum": ["requested", "accepted", "in_progress", "completed", "cancelled"]
+          },
+          "rating": { "type": "number", "nullable": true },
+          "requestedAt": { "type": "string", "format": "date-time" },
+          "cancelledBy": { "type": "string", "nullable": true },
+          "passenger": {
+            "type": "object",
+            "properties": {
+              "id": { "type": "string" },
+              "name": { "type": "string" },
+              "phone": { "type": "string" }
+            }
+          },
+          "driver": {
+            "type": "object",
+            "nullable": true,
+            "properties": {
+              "id": { "type": "string" },
+              "name": { "type": "string" },
+              "phone": { "type": "string" }
+            }
+          }
+        }
+      },
+      "DriverStats": {
+        "type": "object",
+        "properties": {
+          "totalRides": { "type": "number" },
+          "totalEarnings": { "type": "number" },
+          "averageRating": { "type": "number" },
+          "todayRides": { "type": "number" },
+          "todayEarnings": { "type": "number" }
+        }
+      }
+    }
+  },
   "paths": {
     "/api/rides/{id}/accept": {
       "post": {
@@ -20,8 +72,21 @@
           }
         ],
         "responses": {
-          "200": { "description": "Ride accepted successfully" },
-          "400": { "description": "Missing ride ID or invalid ride state" },
+          "200": {
+            "description": "Ride accepted successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": { "type": "string" },
+                    "ride": { "$ref": "#/components/schemas/Ride" }
+                  }
+                }
+              }
+            }
+          },
+          "400": { "description": "Missing ride ID, invalid ride state, or driver has active ride" },
           "401": { "description": "Unauthorized" },
           "403": { "description": "Only drivers can accept rides" },
           "404": { "description": "Ride not found" },
@@ -29,7 +94,6 @@
         }
       }
     },
-
     "/api/rides/{id}/cancel": {
       "post": {
         "summary": "Cancel a ride (passenger or driver only)",
@@ -44,16 +108,145 @@
           }
         ],
         "responses": {
-          "200": { "description": "Ride cancelled successfully" },
-          "400": { "description": "Invalid ride state" },
+          "200": {
+            "description": "Ride cancelled successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": { "type": "string" },
+                    "ride": { "$ref": "#/components/schemas/Ride" }
+                  }
+                }
+              }
+            }
+          },
+          "400": { "description": "Invalid ride state (completed/already cancelled)" },
           "401": { "description": "Unauthorized" },
-          "403": { "description": "Permission denied" },
+          "403": { "description": "Permission denied - can only cancel own rides" },
           "404": { "description": "Ride not found" },
           "500": { "description": "Internal server error" }
         }
       }
     },
-
+    "/api/rides/{id}/reject": {
+      "post": {
+        "summary": "Reject a ride request (drivers only)",
+        "tags": ["Rides"],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "description": "The ID of the ride to reject",
+            "schema": { "type": "string" }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Ride rejected successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": { "type": "string" }
+                  }
+                }
+              }
+            }
+          },
+          "400": { "description": "Missing ride ID or invalid ride state" },
+          "401": { "description": "Unauthorized" },
+          "403": { "description": "Only drivers can reject rides" },
+          "404": { "description": "Ride not found" },
+          "500": { "description": "Internal server error" }
+        }
+      }
+    },
+    "/api/rides/{id}/status": {
+      "post": {
+        "summary": "Update ride status (drivers only)",
+        "tags": ["Rides"],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "description": "The ID of the ride to update",
+            "schema": { "type": "string" }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "status": {
+                    "type": "string",
+                    "enum": ["accepted", "in_progress", "completed", "cancelled"],
+                    "description": "New status for the ride"
+                  }
+                },
+                "required": ["status"]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Ride status updated successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": { "type": "string" },
+                    "ride": { "$ref": "#/components/schemas/Ride" }
+                  }
+                }
+              }
+            }
+          },
+          "400": { "description": "Missing ride ID, invalid status, or invalid status transition" },
+          "401": { "description": "Unauthorized" },
+          "403": { "description": "Only drivers can update ride status / Can only update own rides" },
+          "404": { "description": "Ride not found" },
+          "500": { "description": "Internal server error" }
+        }
+      }
+    },
+    "/api/rides/available": {
+      "get": {
+        "summary": "Get available rides for drivers",
+        "tags": ["Rides"],
+        "description": "Returns up to 10 rides that are requested and not assigned to any driver",
+        "responses": {
+          "200": {
+            "description": "List of available rides",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "rides": {
+                      "type": "array",
+                      "items": { "$ref": "#/components/schemas/Ride" }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": { "description": "Unauthorized" },
+          "403": { "description": "Only drivers can view available rides" },
+          "500": { "description": "Internal server error" }
+        }
+      }
+    },
     "/api/rides/book": {
       "post": {
         "summary": "Book a new ride (passengers only)",
@@ -77,47 +270,99 @@
           }
         },
         "responses": {
-          "201": { "description": "Ride booked successfully" },
-          "400": { "description": "Missing or invalid input" },
+          "201": {
+            "description": "Ride booked successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": { "type": "string" },
+                    "ride": { "$ref": "#/components/schemas/Ride" }
+                  }
+                }
+              }
+            }
+          },
+          "400": { "description": "Missing required fields or passenger has active ride" },
           "401": { "description": "Unauthorized" },
           "403": { "description": "Only passengers can book rides" },
           "500": { "description": "Internal server error" }
         }
       }
     },
-
     "/api/rides/driver": {
       "get": {
         "summary": "Get all rides assigned to the logged-in driver",
         "tags": ["Rides"],
         "responses": {
-          "200": { "description": "List of driver's rides" },
+          "200": {
+            "description": "List of driver's rides",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "rides": {
+                      "type": "array",
+                      "items": { "$ref": "#/components/schemas/Ride" }
+                    }
+                  }
+                }
+              }
+            }
+          },
           "401": { "description": "Unauthorized" },
           "403": { "description": "Only drivers can view their rides" },
           "500": { "description": "Internal server error" }
         }
       }
     },
-
     "/api/rides/driver/stats": {
       "get": {
-        "summary": "Get stats for a driver (earnings, rides, etc.)",
+        "summary": "Get stats for a driver (earnings, rides, ratings, etc.)",
         "tags": ["Rides", "Driver"],
         "responses": {
-          "200": { "description": "Driver statistics" },
+          "200": {
+            "description": "Driver statistics",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "stats": { "$ref": "#/components/schemas/DriverStats" }
+                  }
+                }
+              }
+            }
+          },
           "401": { "description": "Unauthorized" },
           "403": { "description": "Only drivers can view stats" },
           "500": { "description": "Internal server error" }
         }
       }
     },
-
     "/api/rides/passenger": {
       "get": {
         "summary": "Get all rides booked by the passenger",
         "tags": ["Rides", "Passenger"],
         "responses": {
-          "200": { "description": "List of passenger's rides" },
+          "200": {
+            "description": "List of passenger's rides",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "rides": {
+                      "type": "array",
+                      "items": { "$ref": "#/components/schemas/Ride" }
+                    }
+                  }
+                }
+              }
+            }
+          },
           "401": { "description": "Unauthorized" },
           "403": { "description": "Only passengers can view their rides" },
           "500": { "description": "Internal server error" }
