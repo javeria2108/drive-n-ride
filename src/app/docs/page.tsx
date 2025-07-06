@@ -1,15 +1,12 @@
-'use client';
-import SwaggerUI from "swagger-ui-react";
-import "swagger-ui-react/swagger-ui.css";
+'use client'
 
-const page = () => {
-  const specFile = 'src\public\swagger.json';
-  
+import SwaggerUI from 'swagger-ui-react'
+import 'swagger-ui-react/swagger-ui.css'
+
+export default function Page() {
   return (
-    <div>
-      <SwaggerUI url={specFile} />
+    <div style={{ height: '100vh' }}>
+      <SwaggerUI url="/swagger.json" />
     </div>
   )
 }
-
-export default page
