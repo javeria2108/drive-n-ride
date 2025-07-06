@@ -1,9 +1,61 @@
-// app/api/rides/available/route.ts
 
 import { NextRequest, NextResponse } from 'next/server'
 import { getServerSession } from 'next-auth'
 import { authOptions } from '@/lib/auth'
 import { prisma } from '@/lib/prisma'
+
+/**
+ * @swagger
+ * /rides/available:
+ *   get:
+ *     summary: Get available ride requests for drivers
+ *     tags:
+ *       - Rides
+ *     description: |
+ *       Allows authenticated drivers to fetch the latest ride requests that haven't been accepted by any driver yet.
+ *       Only returns rides where the status is "requested" and `driverId` is null.
+ *     responses:
+ *       200:
+ *         description: A list of available ride requests
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 rides:
+ *                   type: array
+ *                   items:
+ *                     type: object
+ *                     properties:
+ *                       id:
+ *                         type: string
+ *                       status:
+ *                         type: string
+ *                         example: requested
+ *                       pickupLocation:
+ *                         type: string
+ *                       dropoffLocation:
+ *                         type: string
+ *                       requestedAt:
+ *                         type: string
+ *                         format: date-time
+ *                       passenger:
+ *                         type: object
+ *                         properties:
+ *                           id:
+ *                             type: string
+ *                           name:
+ *                             type: string
+ *                           phone:
+ *                             type: string
+ *       401:
+ *         description: Unauthorized - user not logged in
+ *       403:
+ *         description: Only drivers can view available rides
+ *       500:
+ *         description: Internal server error
+ */
+
 
 export async function GET(request: NextRequest) {
   try {

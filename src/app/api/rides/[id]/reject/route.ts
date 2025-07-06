@@ -1,10 +1,49 @@
-// app/api/rides/[id]/reject/route.ts
+
 
 import { NextRequest, NextResponse } from 'next/server'
 import { getServerSession } from 'next-auth'
 import { authOptions } from '@/lib/auth'
 import { prisma } from '@/lib/prisma'
-
+/**
+ * @swagger
+ * /rides/{id}/reject:
+ *   post:
+ *     summary: Reject a ride (for drivers only)
+ *     tags:
+ *       - Rides
+ *     description: |
+ *       Allows a driver to reject a requested ride. This does not change the database, just acknowledges the rejection.
+ *     parameters:
+ *       - name: id
+ *         in: path
+ *         required: true
+ *         description: The ID of the ride to reject
+ *         schema:
+ *           type: string
+ *     responses:
+ *       200:
+ *         description: Ride rejected successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: Ride rejected successfully
+ *       400:
+ *         description: |
+ *           - Ride ID missing in URL  
+ *           - Ride is not in 'requested' state
+ *       401:
+ *         description: Unauthorized - user not authenticated
+ *       403:
+ *         description: Only drivers can reject rides
+ *       404:
+ *         description: Ride not found
+ *       500:
+ *         description: Internal server error
+ */
 export async function POST(request: NextRequest) {
   try {
     // Extract rideId from the URL

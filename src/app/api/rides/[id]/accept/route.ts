@@ -1,9 +1,68 @@
-// app/api/rides/[id]/accept/route.ts
 
 import { NextRequest, NextResponse } from 'next/server'
 import { getServerSession } from 'next-auth'
 import { authOptions } from '@/lib/auth'
 import { PrismaClient } from '@/src/generated/prisma'
+
+/**
+ * @swagger
+ * /rides/{id}/accept:
+ *   post:
+ *     summary: Accept a ride request (drivers only)
+ *     tags:
+ *       - Rides
+ *     description: |
+ *       Allows a driver to accept a ride request. Only available to authenticated users with the "driver" role.
+ *       A driver cannot accept a ride if they already have an active ride (status: accepted or in_progress).
+ *     parameters:
+ *       - name: id
+ *         in: path
+ *         required: true
+ *         description: The ID of the ride to accept
+ *         schema:
+ *           type: string
+ *     responses:
+ *       200:
+ *         description: Ride accepted successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: Ride accepted successfully
+ *                 ride:
+ *                   type: object
+ *                   properties:
+ *                     id:
+ *                       type: string
+ *                     status:
+ *                       type: string
+ *                       example: accepted
+ *                     driverId:
+ *                       type: string
+ *                     passenger:
+ *                       type: object
+ *                       properties:
+ *                         id:
+ *                           type: string
+ *                         name:
+ *                           type: string
+ *                         phone:
+ *                           type: string
+ *       400:
+ *         description: Bad request - Missing ride ID, ride already accepted, or driver has active ride
+ *       401:
+ *         description: Unauthorized - No session or user
+ *       403:
+ *         description: Forbidden - Only drivers can accept rides
+ *       404:
+ *         description: Ride not found
+ *       500:
+ *         description: Internal server error
+ */
+
 
 const prisma = new PrismaClient()
 
