@@ -338,7 +338,7 @@ export default function DriverDashboard() {
             </CardHeader>
             <CardContent>
               <div className="text-2xl font-bold text-white">
-                {isLoadingStats ? <Loader2 className="h-6 w-6 animate-spin" /> : `$${stats.totalEarnings.toFixed(2)}`}
+                {isLoadingStats ? <Loader2 className="h-6 w-6 animate-spin" /> : `Rs.${stats.totalEarnings.toFixed(2)}`}
               </div>
             </CardContent>
           </Card>
@@ -380,7 +380,7 @@ export default function DriverDashboard() {
             </CardHeader>
             <CardContent>
               <div className="text-2xl font-bold text-white">
-                {isLoadingStats ? <Loader2 className="h-6 w-6 animate-spin" /> : `$${stats.todayEarnings.toFixed(2)}`}
+                {isLoadingStats ? <Loader2 className="h-6 w-6 animate-spin" /> : `Rs.${stats.todayEarnings.toFixed(2)}`}
               </div>
             </CardContent>
           </Card>
@@ -446,11 +446,11 @@ export default function DriverDashboard() {
                         </div>
                         <div className="text-right">
                           <div className="text-xl font-bold text-green-400">
-                            ${ride.discountedFare || ride.fare}
+                            Rs.{ride.discountedFare || ride.fare}
                           </div>
                           {ride.discountedFare && (
                             <div className="text-sm text-slate-400 line-through">
-                              ${ride.fare}
+                              Rs.{ride.fare}
                             </div>
                           )}
                         </div>
@@ -550,7 +550,7 @@ export default function DriverDashboard() {
                         </div>
                         <div className="text-right">
                           <div className="text-lg font-bold text-green-400">
-                            ${ride.discountedFare || ride.fare}
+                            Rs.{ride.discountedFare || ride.fare}
                           </div>
                           {ride.rating && (
                             <div className="flex items-center space-x-1 text-sm text-yellow-400">

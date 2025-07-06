@@ -463,7 +463,7 @@ export default function RiderDashboard() {
                         {ride.status.replace('_', ' ')}
                       </Badge>
                       <div className="text-right">
-                        <p className="text-white font-bold">₹{ride.fare}</p>
+                        <p className="text-white font-bold">Rs.{ride.fare}</p>
                         {ride.rating && (
                           <div className="flex items-center space-x-1">
                             <Star className="h-3 w-3 text-yellow-400 fill-current" />
