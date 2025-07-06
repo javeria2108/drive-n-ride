@@ -4,60 +4,6 @@ import { getServerSession } from 'next-auth'
 import { authOptions } from '@/lib/auth'
 import { prisma } from '@/lib/prisma'
 import { Role } from '@/src/generated/prisma'
-/**
- * @swagger
- * /api/rides/{id}/cancel:
- *   post:
- *     summary: Cancel a ride (for passenger or driver)
- *     tags:
- *       - Rides
- *     description: |
- *       Allows a passenger or a driver to cancel a ride. The user must be authenticated and either the passenger or the driver of the ride.
- *       Completed rides cannot be cancelled. Already-cancelled rides will return an appropriate message.
- *     parameters:
- *       - name: id
- *         in: path
- *         required: true
- *         description: The ID of the ride to cancel
- *         schema:
- *           type: string
- *     responses:
- *       200:
- *         description: Ride cancelled successfully
- *         content:
- *           application/json:
- *             schema:
- *               type: object
- *               properties:
- *                 message:
- *                   type: string
- *                   example: Ride cancelled successfully
- *                 ride:
- *                   type: object
- *                   properties:
- *                     id:
- *                       type: string
- *                     status:
- *                       type: string
- *                       example: cancelled
- *                     cancelledBy:
- *                       type: string
- *                       example: driver
- *       400:
- *         description: |
- *           - Ride ID missing in URL  
- *           - Ride already cancelled  
- *           - Ride completed and cannot be cancelled
- *       401:
- *         description: Unauthorized - user not authenticated
- *       403:
- *         description: User does not have permission to cancel the ride
- *       404:
- *         description: Ride not found
- *       500:
- *         description: Internal server error
- */
-
 
 export async function POST(request: NextRequest) {
   try {

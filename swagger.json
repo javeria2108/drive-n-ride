@@ -1,0 +1,128 @@
+{
+  "openapi": "3.0.0",
+  "info": {
+    "title": "Drive-N-Ride API",
+    "version": "1.0.0",
+    "description": "API documentation for the Drive-N-Ride backend"
+  },
+  "paths": {
+    "/api/rides/{id}/accept": {
+      "post": {
+        "summary": "Accept a ride request (drivers only)",
+        "tags": ["Rides"],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "description": "The ID of the ride to accept",
+            "schema": { "type": "string" }
+          }
+        ],
+        "responses": {
+          "200": { "description": "Ride accepted successfully" },
+          "400": { "description": "Missing ride ID or invalid ride state" },
+          "401": { "description": "Unauthorized" },
+          "403": { "description": "Only drivers can accept rides" },
+          "404": { "description": "Ride not found" },
+          "500": { "description": "Internal server error" }
+        }
+      }
+    },
+
+    "/api/rides/{id}/cancel": {
+      "post": {
+        "summary": "Cancel a ride (passenger or driver only)",
+        "tags": ["Rides"],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "description": "The ID of the ride to cancel",
+            "schema": { "type": "string" }
+          }
+        ],
+        "responses": {
+          "200": { "description": "Ride cancelled successfully" },
+          "400": { "description": "Invalid ride state" },
+          "401": { "description": "Unauthorized" },
+          "403": { "description": "Permission denied" },
+          "404": { "description": "Ride not found" },
+          "500": { "description": "Internal server error" }
+        }
+      }
+    },
+
+    "/api/rides/book": {
+      "post": {
+        "summary": "Book a new ride (passengers only)",
+        "tags": ["Rides"],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "pickupLocation": { "type": "string" },
+                  "dropLocation": { "type": "string" },
+                  "rideType": { "type": "string" },
+                  "distanceKm": { "type": "number" },
+                  "fare": { "type": "number" }
+                },
+                "required": ["pickupLocation", "dropLocation", "rideType", "distanceKm", "fare"]
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": { "description": "Ride booked successfully" },
+          "400": { "description": "Missing or invalid input" },
+          "401": { "description": "Unauthorized" },
+          "403": { "description": "Only passengers can book rides" },
+          "500": { "description": "Internal server error" }
+        }
+      }
+    },
+
+    "/api/rides/driver": {
+      "get": {
+        "summary": "Get all rides assigned to the logged-in driver",
+        "tags": ["Rides"],
+        "responses": {
+          "200": { "description": "List of driver's rides" },
+          "401": { "description": "Unauthorized" },
+          "403": { "description": "Only drivers can view their rides" },
+          "500": { "description": "Internal server error" }
+        }
+      }
+    },
+
+    "/api/rides/driver/stats": {
+      "get": {
+        "summary": "Get stats for a driver (earnings, rides, etc.)",
+        "tags": ["Rides", "Driver"],
+        "responses": {
+          "200": { "description": "Driver statistics" },
+          "401": { "description": "Unauthorized" },
+          "403": { "description": "Only drivers can view stats" },
+          "500": { "description": "Internal server error" }
+        }
+      }
+    },
+
+    "/api/rides/passenger": {
+      "get": {
+        "summary": "Get all rides booked by the passenger",
+        "tags": ["Rides", "Passenger"],
+        "responses": {
+          "200": { "description": "List of passenger's rides" },
+          "401": { "description": "Unauthorized" },
+          "403": { "description": "Only passengers can view their rides" },
+          "500": { "description": "Internal server error" }
+        }
+      }
+    }
+  }
+}

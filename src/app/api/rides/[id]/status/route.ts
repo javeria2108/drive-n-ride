@@ -3,42 +3,6 @@ import { NextRequest, NextResponse } from 'next/server'
 import { getServerSession } from 'next-auth'
 import { authOptions } from '@/lib/auth'
 import { prisma } from '@/lib/prisma'
-/**
- * @swagger
- * /api/rides/{id}/status:
- *   post:
- *     summary: Update the status of a ride (driver-only)
- *     tags:
- *       - Rides
- *     parameters:
- *       - name: id
- *         in: path
- *         required: true
- *         description: ID of the ride
- *         schema:
- *           type: string
- *     requestBody:
- *       required: true
- *       content:
- *         application/json:
- *           schema:
- *             type: object
- *             properties:
- *               status:
- *                 type: string
- *                 enum: [accepted, in_progress, completed, cancelled]
- *     responses:
- *       200:
- *         description: Ride status updated successfully
- *       400:
- *         description: Invalid input or invalid status transition
- *       401:
- *         description: Unauthorized (not logged in)
- *       403:
- *         description: Forbidden (not the ride owner or wrong role)
- *       404:
- *         description: Ride not found
- */
 
 export async function POST(request: NextRequest) {
   try {

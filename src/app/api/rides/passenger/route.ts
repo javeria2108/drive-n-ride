@@ -3,60 +3,6 @@ import { getServerSession } from 'next-auth'
 import { authOptions } from '@/lib/auth'
 import { prisma } from '@/lib/prisma' 
 
-/**
- * @swagger
- * /api/rides/passenger:
- *   get:
- *     summary: Get all rides booked by the logged-in passenger
- *     description: Retrieves a list of rides where the logged-in user is the passenger. Only accessible by users with the `passenger` role.
- *     tags:
- *       - Rides (Passenger)
- *     responses:
- *       200:
- *         description: List of passenger's rides
- *         content:
- *           application/json:
- *             schema:
- *               type: object
- *               properties:
- *                 rides:
- *                   type: array
- *                   items:
- *                     type: object
- *                     properties:
- *                       id:
- *                         type: string
- *                       pickupLocation:
- *                         type: string
- *                       dropLocation:
- *                         type: string
- *                       status:
- *                         type: string
- *                         enum: [requested, accepted, in_progress, completed, cancelled]
- *                       fare:
- *                         type: number
- *                       discountedFare:
- *                         type: number
- *                       requestedAt:
- *                         type: string
- *                         format: date-time
- *                       driver:
- *                         type: object
- *                         properties:
- *                           id:
- *                             type: string
- *                           name:
- *                             type: string
- *                           phone:
- *                             type: string
- *       401:
- *         description: Unauthorized
- *       403:
- *         description: Only passengers can access this route
- *       500:
- *         description: Internal server error
- */
-
 
 export async function GET(request: NextRequest) {
   try {

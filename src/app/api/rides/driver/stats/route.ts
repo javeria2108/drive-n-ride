@@ -3,54 +3,6 @@ import { getServerSession } from 'next-auth'
 import { authOptions } from '@/lib/auth'
 import { prisma } from '@/lib/prisma' 
 
-/**
- * @swagger
- * /api/rides/driver/stats:
- *   get:
- *     summary: Get driver's ride statistics
- *     tags:
- *       - Rides
- *     description: |
- *       Returns the total rides, earnings, and average rating for the logged-in driver, 
- *       including stats specific to today.
- *     security:
- *       - bearerAuth: []
- *     responses:
- *       200:
- *         description: Driver stats fetched successfully
- *         content:
- *           application/json:
- *             schema:
- *               type: object
- *               properties:
- *                 stats:
- *                   type: object
- *                   properties:
- *                     totalRides:
- *                       type: integer
- *                       example: 15
- *                     totalEarnings:
- *                       type: number
- *                       format: float
- *                       example: 2850.50
- *                     averageRating:
- *                       type: number
- *                       format: float
- *                       example: 4.7
- *                     todayRides:
- *                       type: integer
- *                       example: 2
- *                     todayEarnings:
- *                       type: number
- *                       format: float
- *                       example: 550.0
- *       401:
- *         description: Unauthorized - user not logged in
- *       403:
- *         description: Only drivers can view stats
- *       500:
- *         description: Internal server error
- */
 export async function GET(request: NextRequest) {
   try {
     const session = await getServerSession(authOptions)
