@@ -1,3 +1,4 @@
+import path from 'path'
 import swaggerJSDoc from 'swagger-jsdoc'
 
 const swaggerDefinition = {
@@ -19,7 +20,7 @@ const swaggerDefinition = {
 
 const options = {
   swaggerDefinition,
-  apis: ['./app/api/**/*.ts'], // Adjust this path based on your file structure
+  apis: [path.resolve(process.cwd(), 'app/api/**/*.ts')], 
 }
 
 const swaggerSpec = swaggerJSDoc(options)
