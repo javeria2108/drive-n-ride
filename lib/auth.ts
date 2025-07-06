@@ -5,8 +5,8 @@ import { prisma } from './prisma'
 import bcrypt from 'bcryptjs'
 import { loginSchema } from './validations/auth'
 
-// Extend the Session user type to include id, role, and phone
-declare module "next-auth" {
+// Extend the Session user type
+declare module 'next-auth' {
   interface Session {
     user: {
       id: string
@@ -17,6 +17,18 @@ declare module "next-auth" {
       image?: string | null
     }
   }
+
+  interface User {
+    id: string
+    role: string
+    phone: string
+  }
+
+  interface JWT {
+    sub: string
+    role: string
+    phone: string
+  }
 }
 
 export const authOptions: NextAuthOptions = {
@@ -26,32 +38,32 @@ export const authOptions: NextAuthOptions = {
       name: 'credentials',
       credentials: {
         email: { label: 'Email', type: 'email' },
-        password: { label: 'Password', type: 'password' }
+        password: { label: 'Password', type: 'password' },
       },
       async authorize(credentials) {
-        if (!credentials?.email || !credentials?.password) {
-          return null
-        }
+        if (!credentials?.email || !credentials?.password) return null
 
         const validatedFields = loginSchema.safeParse(credentials)
-        if (!validatedFields.success) {
-          return null
-        }
+        if (!validatedFields.success) return null
 
         const { email, password } = validatedFields.data
 
         const user = await prisma.user.findUnique({
-          where: { email }
+          where: { email },
+          select: {
+            id: true,
+            email: true,
+            name: true,
+            password: true,
+            role: true,
+            phone: true,
+          },
         })
 
-        if (!user) {
-          return null
-        }
+        if (!user) return null
 
         const isPasswordValid = await bcrypt.compare(password, user.password)
-        if (!isPasswordValid) {
-          return null
-        }
+        if (!isPasswordValid) return null
 
         return {
           id: user.id,
@@ -60,8 +72,8 @@ export const authOptions: NextAuthOptions = {
           role: user.role,
           phone: user.phone,
         }
-      }
-    })
+      },
+    }),
   ],
   session: {
     strategy: 'jwt',
@@ -70,8 +82,8 @@ export const authOptions: NextAuthOptions = {
   callbacks: {
     async jwt({ token, user }) {
       if (user) {
-        token.role = (user as any).role
-        token.phone = (user as any).phone
+        token.role = user.role
+        token.phone = user.phone
       }
       return token
     },
