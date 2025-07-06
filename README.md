@@ -1,40 +1,115 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/create-next-app).
 
-## Getting Started
+# 🚕 Ride Booking System
 
-First, run the development server:
+A minimal ride-hailing backend system designed for small city testing. This project manages users (passengers & drivers) and allows passengers to request rides while drivers can accept and complete them.
+
+---
+
+## 📌 Features
+
+- 👤 User management with roles: `passenger` and `driver`
+- 📍 Ride booking with pickup & drop locations
+- 🚗 Ride types: `bike`, `car`, `rickshaw`
+- 💰 Fare calculation with optional discounts
+- 📊 Ride status management: requested, accepted, in-progress, completed, cancelled
+- ⭐ Ratings & cancellation tracking
+
+
+## ⚙️ Tech Stack
+
+| Layer          | Technology                     |
+| -------------- | ------------------------------ |
+| Language       | TypeScript                     |
+| Backend        | Next.js                        |
+| ORM / DB Layer | Prisma ORM                     |
+| Database       | PostgreSQL NeonDB              |
+| Auth           | NextAuth        |
+| Deployment     | Vercel                         |
+
+---
+
+## 🚀 Getting Started
+
+### 1. Clone the Repository
+
+```bash
+git clone https://github.com/javeria2108/drive-n-ride.git
+cd drive-n-ride
+```
+
+### 2. Install Dependencies
+
+```bash
+npm install
+```
+
+### 3. Configure Environment Variables
+
+Create a `.env` file based on `.env.example`.
+
+```bash
+DATABASE_URL = YOUR_DB_URL_HERE
+NEXTAUTH_SECRET = ADD YOUR SECRET 32 CHARACTERS KEY  
+NEXTAUTH_URL= http://localhost:3000 
+```
+
+Add your database connection URL, secret keys, etc.
+
+### 4. Set Up the Database
+
+Run Prisma or your migration tool:
+
+```bash
+npx prisma migrate dev --name init
+```
+
+Or manually create tables using SQL.
+
+### 5. Start the Server
 
 ```bash
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+## 📋 Role-based Logic
 
-You can start editing the page by modifying `app/route.ts`. The page auto-updates as you edit the file.
+* **Passenger** can:
 
-## Learn More
+  * Request a ride
+  * Cancel a ride before acceptance
+  * Rate driver after ride
 
-To learn more about Next.js, take a look at the following resources:
+* **Driver** can:
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+  * Accept a ride
+  * Mark as in-progress / completed
+  * Reject only before in-progress
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+---
 
-## Deploy on Vercel
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+## 🧑‍💻 Contributing
 
-## API Routes
+Contributions are welcome! Follow these steps:
 
-This directory contains example API routes for the headless API app.
+1. Fork the repo
+2. Create a new branch: `git checkout -b feature/your-feature`
+3. Commit changes: `git commit -m "Add your feature"`
+4. Push: `git push origin feature/your-feature`
+5. Submit a PR
 
-For more details, see [route.js file convention](https://nextjs.org/docs/app/api-reference/file-conventions/route).
+---
+
+## 🛡️ License
+
+This project is open-source under the [MIT License](LICENSE).
+
+---
+
+## 🙌 Acknowledgements
+
+Built as part of a lightweight ride-hailing prototype for smaller cities. Contributions and feedback are highly appreciated!
+
+---
+
