@@ -6,7 +6,7 @@ import { PrismaClient } from '@/src/generated/prisma'
 
 /**
  * @swagger
- * /rides/{id}/accept:
+ * api/rides/{id}/accept:
  *   post:
  *     summary: Accept a ride request (drivers only)
  *     tags:

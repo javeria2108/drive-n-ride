@@ -5,7 +5,7 @@ import { prisma } from '@/lib/prisma'
 
 /**
  * @swagger
- * /rides/driver/stats:
+ * api/rides/driver/stats:
  *   get:
  *     summary: Get driver's ride statistics
  *     tags:

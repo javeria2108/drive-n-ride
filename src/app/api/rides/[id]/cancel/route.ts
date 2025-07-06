@@ -6,7 +6,7 @@ import { prisma } from '@/lib/prisma'
 import { Role } from '@/src/generated/prisma'
 /**
  * @swagger
- * /rides/{id}/cancel:
+ * api/rides/{id}/cancel:
  *   post:
  *     summary: Cancel a ride (for passenger or driver)
  *     tags:

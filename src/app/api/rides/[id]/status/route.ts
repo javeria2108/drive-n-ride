@@ -5,7 +5,7 @@ import { authOptions } from '@/lib/auth'
 import { prisma } from '@/lib/prisma'
 /**
  * @swagger
- * /rides/{id}/status:
+ * api/rides/{id}/status:
  *   post:
  *     summary: Update the status of a ride (driver-only)
  *     tags:
