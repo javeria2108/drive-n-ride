@@ -389,7 +389,7 @@ export default function RiderDashboard() {
                     </div>
                     <div className="text-right">
                       <p className="text-sm text-slate-400">Fare</p>
-                      <p className="text-white font-bold">₹{activeRide.fare}</p>
+                      <p className="text-white font-bold">Rs.{activeRide.fare}</p>
                     </div>
                   </div>
 

@@ -7,7 +7,6 @@ import { prisma } from '@/lib/prisma'
 
 export async function POST(request: NextRequest) {
   try {
-    // ✅ Explicitly pass request to getServerSession (required in App Router)
     const session = await getServerSession({ req: request, ...authOptions })
 
     if (!session || !session.user) {
