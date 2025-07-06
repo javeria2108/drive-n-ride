@@ -6,7 +6,7 @@ import { prisma } from '@/lib/prisma'
 
 /**
  * @swagger
- * api/rides/book:
+ * /api/rides/book:
  *   post:
  *     summary: Book a ride (passengers only)
  *     tags:

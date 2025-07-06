@@ -5,7 +5,7 @@ import { prisma } from '@/lib/prisma'
 
 /**
  * @swagger
- * api/rides/driver:
+ * /api/rides/driver:
  *   get:
  *     summary: Get all rides assigned to the logged-in driver
  *     description: Retrieves a list of rides where the logged-in user is the assigned driver. Only accessible by drivers.

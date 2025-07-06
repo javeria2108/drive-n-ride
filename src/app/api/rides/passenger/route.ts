@@ -5,7 +5,7 @@ import { prisma } from '@/lib/prisma'
 
 /**
  * @swagger
- * api/rides/passenger:
+ * /api/rides/passenger:
  *   get:
  *     summary: Get all rides booked by the logged-in passenger
  *     description: Retrieves a list of rides where the logged-in user is the passenger. Only accessible by users with the `passenger` role.

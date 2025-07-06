@@ -6,7 +6,7 @@ import { authOptions } from '@/lib/auth'
 import { prisma } from '@/lib/prisma'
 /**
  * @swagger
- * api/rides/{id}/reject:
+ * /api/rides/{id}/reject:
  *   post:
  *     summary: Reject a ride (for drivers only)
  *     tags:
