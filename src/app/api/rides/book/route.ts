@@ -1,12 +1,15 @@
 // app/api/rides/book/route.ts
+
 import { NextRequest, NextResponse } from 'next/server'
 import { getServerSession } from 'next-auth'
 import { authOptions } from '@/lib/auth'
-import { prisma } from '@/lib/prisma' 
+import { prisma } from '@/lib/prisma'
+
 export async function POST(request: NextRequest) {
   try {
-    const session = await getServerSession(authOptions)
-    
+    // ✅ Explicitly pass request to getServerSession (required in App Router)
+    const session = await getServerSession({ req: request, ...authOptions })
+
     if (!session || !session.user) {
       return NextResponse.json({ message: 'Unauthorized' }, { status: 401 })
     }
@@ -17,12 +20,12 @@ export async function POST(request: NextRequest) {
 
     const { pickupLocation, dropLocation, rideType, distanceKm, fare } = await request.json()
 
-    // Validate required fields
+    // ✅ Validate required fields
     if (!pickupLocation || !dropLocation || !rideType || !distanceKm || !fare) {
       return NextResponse.json({ message: 'Missing required fields' }, { status: 400 })
     }
 
-    // Check if passenger already has an active ride
+    // ✅ Check if passenger already has an active ride
     const existingRide = await prisma.ride.findFirst({
       where: {
         passengerId: session.user.id,
@@ -33,12 +36,12 @@ export async function POST(request: NextRequest) {
     })
 
     if (existingRide) {
-      return NextResponse.json({ 
-        message: 'You already have an active ride. Please complete or cancel it first.' 
+      return NextResponse.json({
+        message: 'You already have an active ride. Please complete or cancel it first.'
       }, { status: 400 })
     }
 
-    // Create the ride
+    // ✅ Create the ride
     const ride = await prisma.ride.create({
       data: {
         passengerId: session.user.id,
@@ -60,15 +63,15 @@ export async function POST(request: NextRequest) {
       }
     })
 
-    return NextResponse.json({ 
-      message: 'Ride booked successfully', 
-      ride 
+    return NextResponse.json({
+      message: 'Ride booked successfully',
+      ride
     }, { status: 201 })
 
   } catch (error) {
     console.error('Error booking ride:', error)
-    return NextResponse.json({ 
-      message: 'Internal server error' 
+    return NextResponse.json({
+      message: 'Internal server error'
     }, { status: 500 })
   }
 }

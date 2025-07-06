@@ -1,12 +1,15 @@
 // app/api/rides/available/route.ts
+
 import { NextRequest, NextResponse } from 'next/server'
 import { getServerSession } from 'next-auth'
 import { authOptions } from '@/lib/auth'
-import { prisma } from '@/lib/prisma' 
+import { prisma } from '@/lib/prisma'
+
 export async function GET(request: NextRequest) {
   try {
-    const session = await getServerSession(authOptions)
-    
+    // ✅ Pass request explicitly to getServerSession in App Router
+    const session = await getServerSession({ req: request, ...authOptions })
+
     if (!session || !session.user) {
       return NextResponse.json({ message: 'Unauthorized' }, { status: 401 })
     }
@@ -15,7 +18,7 @@ export async function GET(request: NextRequest) {
       return NextResponse.json({ message: 'Only drivers can view available rides' }, { status: 403 })
     }
 
-    // Get rides that are requested (not yet accepted by any driver)
+    // ✅ Get all rides that are requested and not assigned to any driver
     const rides = await prisma.ride.findMany({
       where: {
         status: 'requested',
@@ -33,15 +36,15 @@ export async function GET(request: NextRequest) {
       orderBy: {
         requestedAt: 'desc'
       },
-      take: 10 // Limit to 10 most recent rides
+      take: 10 // limit results
     })
 
     return NextResponse.json({ rides }, { status: 200 })
 
   } catch (error) {
     console.error('Error fetching available rides:', error)
-    return NextResponse.json({ 
-      message: 'Internal server error' 
+    return NextResponse.json({
+      message: 'Internal server error'
     }, { status: 500 })
   }
 }
