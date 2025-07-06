@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import { signIn, getSession } from 'next-auth/react'
+import { signIn, useSession } from 'next-auth/react'
 import { useRouter, useSearchParams } from 'next/navigation'
 import Link from 'next/link'
 import { Button } from '@/components/ui/button'
@@ -23,29 +23,29 @@ export default function LoginPage() {
   const [showPassword, setShowPassword] = useState(false)
   const [loginError, setLoginError] = useState('')
   const [successMessage, setSuccessMessage] = useState('')
+
   const router = useRouter()
   const searchParams = useSearchParams()
+  const { data: session, status } = useSession()
 
+  // ✅ Handle message from signup and session redirect
   useEffect(() => {
-    // Check for success message from signup
     const message = searchParams.get('message')
     if (message) {
       setSuccessMessage(message)
     }
 
-    // Check if user is already logged in
-    const checkSession = async () => {
-      const session = await getSession()
-      if (session) {
+    if (status === 'authenticated') {
+      if (session?.user?.role === 'driver') {
+        router.push('/driver/dashboard')
+      } else {
         router.push('/dashboard')
       }
     }
-    checkSession()
-  }, [searchParams, router])
+  }, [searchParams, status, session, router])
 
   const handleInputChange = (field: keyof LoginInput, value: string) => {
     setFormData(prev => ({ ...prev, [field]: value }))
-    // Clear error when user starts typing
     if (errors[field]) {
       setErrors(prev => ({ ...prev, [field]: undefined }))
     }
@@ -58,10 +58,8 @@ export default function LoginPage() {
     setLoginError('')
 
     try {
-      // Validate form data
       const validatedData = loginSchema.parse(formData)
 
-      // Sign in using NextAuth
       const result = await signIn('credentials', {
         email: validatedData.email,
         password: validatedData.password,
@@ -74,15 +72,8 @@ export default function LoginPage() {
       }
 
       if (result?.ok) {
-        // Get the session to check user role
-        const session = await getSession()
-        
-        // Redirect based on user role or to dashboard
-        if (session?.user?.role === 'driver') {
-          router.push('/driver/dashboard')
-        } else {
-          router.push('/dashboard')
-        }
+        // Let useSession() take over and redirect in the next render cycle
+        router.refresh() // Optional: force re-fetch session
       }
     } catch (error) {
       if (error instanceof z.ZodError) {
@@ -103,7 +94,6 @@ export default function LoginPage() {
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900 flex items-center justify-center p-4">
       <div className="w-full max-w-md space-y-6">
-        {/* Logo/Header */}
         <div className="text-center space-y-2">
           <div className="flex items-center justify-center space-x-2">
             <Car className="h-8 w-8 text-purple-400" />
@@ -138,7 +128,6 @@ export default function LoginPage() {
             )}
 
             <form onSubmit={handleSubmit} className="space-y-4">
-              {/* Email Field */}
               <div className="space-y-2">
                 <Label htmlFor="email" className="text-slate-300">
                   Email
@@ -160,7 +149,6 @@ export default function LoginPage() {
                 )}
               </div>
 
-              {/* Password Field */}
               <div className="space-y-2">
                 <Label htmlFor="password" className="text-slate-300">
                   Password
@@ -189,7 +177,6 @@ export default function LoginPage() {
                 )}
               </div>
 
-              {/* Remember Me & Forgot Password */}
               <div className="flex items-center justify-between">
                 <div className="flex items-center space-x-2">
                   <input
@@ -209,7 +196,6 @@ export default function LoginPage() {
                 </Link>
               </div>
 
-              {/* Submit Button */}
               <Button
                 type="submit"
                 disabled={isLoading}
@@ -226,7 +212,6 @@ export default function LoginPage() {
               </Button>
             </form>
 
-            {/* Divider */}
             <div className="relative">
               <div className="absolute inset-0 flex items-center">
                 <div className="w-full border-t border-slate-600"></div>
@@ -236,7 +221,6 @@ export default function LoginPage() {
               </div>
             </div>
 
-            {/* Demo Accounts */}
             <div className="space-y-2">
               <p className="text-sm text-slate-400 text-center">Quick demo access:</p>
               <div className="grid grid-cols-2 gap-2">
@@ -271,7 +255,6 @@ export default function LoginPage() {
               </div>
             </div>
 
-            {/* Signup Link */}
             <div className="text-center">
               <p className="text-slate-400 text-sm">
                 Don't have an account?{' '}
